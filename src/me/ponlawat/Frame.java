@@ -12,8 +12,9 @@ public class Frame extends JFrame
     Frame(){
     	cFrame = this;
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
-        setSize(400, 400);
+		setSize(1200, 720);
+//		setPreferredSize(new Dimension(1200, 720));
+		setLocationRelativeTo(null);
         setContentPane(comp());
         setVisible(true);
     }

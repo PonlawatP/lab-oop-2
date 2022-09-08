@@ -25,7 +25,7 @@ public class meteor extends JPanel implements Runnable
 
 	boolean isRide = false;
 	
-//	double valo_x = 0, valo_y = 0.1 + new Random().nextDouble(0.6);
+//	double valo_x = 0.1 + new Random().nextDouble(0.6), valo_y = 0;
 	double valo_x = 0.1 + new Random().nextDouble(0.6), valo_y = 0.1 + new Random().nextDouble(0.6);
 	BufferedImage bi = null;
 	BufferedImage bif = new BufferedImage(30, 30, BufferedImage.TYPE_INT_ARGB);
@@ -33,6 +33,7 @@ public class meteor extends JPanel implements Runnable
 	private void randomPosition(){
 		x = new Random().nextInt(cFrame.getWidth()-60);
 		y = new Random().nextInt(cFrame.getHeight()-60);
+//		y = 0;
 
 		Iterator<meteor> metlist = getMeteors().iterator();
 		do {
@@ -155,16 +156,31 @@ public class meteor extends JPanel implements Runnable
 		return isOverrideHorizontal(ox) && isOverrideVertical(oy);
 	}
 
-	private void handleMeteorAttack(meteor tarket, boolean forward_or_up){
+	private void handleMeteorAttack(meteor target, boolean forward_or_up){
 //			อัตราเร็ว | ทิศทาง
+
 		if(forward_or_up){
-			tarket.setForward(!tarket.isForward());
-			setForward(!isForward());
-			System.out.print("1\t");
+			if(isForward() != target.isForward()){
+				setForward(!isForward());
+				target.setForward(!target.isForward());
+			} else {
+				if(target.getMetValoX() > getMetValoX()){
+					target.setForward(!target.isForward());
+				} else {
+					setForward(!isForward());
+				}
+			}
 		} else {
-			tarket.setUp(!tarket.isUp());
-			setUp(!isUp());
-			System.out.print("2\t");
+			if(isUp() != target.isUp()){
+				setUp(!isUp());
+				target.setUp(!target.isUp());
+			} else {
+				if(target.getMetValoY() > getMetValoY()){
+					target.setUp(!target.isUp());
+				} else {
+					setUp(!isUp());
+				}
+			}
 		}
 	}
 
