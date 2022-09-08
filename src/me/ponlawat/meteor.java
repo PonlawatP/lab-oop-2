@@ -22,7 +22,10 @@ public class meteor extends JPanel implements Runnable
 
 	double x=0, y=0, rotate=0;
 	int v=Math.random()>=0.5?-1:1,h=Math.random()>=0.5?-1:1;
+
+	boolean isRide = false;
 	
+//	double valo_x = 0.1 + new Random().nextDouble(0.6), valo_y = 0;
 	double valo_x = 0.1 + new Random().nextDouble(0.6), valo_y = 0.1 + new Random().nextDouble(0.6);
 	BufferedImage bi = null;
 	BufferedImage bif = new BufferedImage(30, 30, BufferedImage.TYPE_INT_ARGB);
@@ -40,9 +43,9 @@ public class meteor extends JPanel implements Runnable
     	
     	bi = resize(bi, 30, 30);
 
-    	x = new Random().nextInt(cFrame.getWidth()-30);
-    	y = new Random().nextInt(cFrame.getHeight()-60);
-//    	y = 0;
+    	x = new Random().nextInt(cFrame.getWidth()-60);
+//    	y = new Random().nextInt(cFrame.getHeight()-60);
+    	y = 0;
     	
     	setLocation((int)x,(int)y);
     	setBackground(null);
@@ -115,62 +118,88 @@ public class meteor extends JPanel implements Runnable
     	return v==1;
     }
     public void setForward(boolean var) {
-    	if(!var) v = -1; else v = 1;
+    	if(!var) h = -1; else h = 1;
     }
     public void setUp(boolean var) {
     	if(var) v = -1; else v = 1;
     }
-    
-    public boolean isOverride(int ox, int oy) {
-    	boolean res = 
-		    			ox + 30 >= getX() && ox <= getX() + 30
-							&&
-						oy + 30 >= getY() && oy <= getY() + 30;
-		
-//    	System.out.println("ox: " + ox + ", x:" + getX() + ", res: " + res);
-    	return res;
-    }
+
+	public boolean isRide() {
+		return isRide;
+	}
+
+	public void setRide(boolean ride) {
+		isRide = ride;
+	}
+
+	public boolean isOverrideHorizontal(int ox) {
+		return (ox < getX() && ox+30 > getX()) || (ox > getX() && ox < getX()+30);
+	}
+	public boolean isOverrideVertical(int oy) {
+		return (oy < getY() && oy+30 > getY()) || (oy > getY() && oy < getY()+30);
+	}
+
+	public boolean isOverride(int ox, int oy) {
+//		boolean res =
+//				(ox < getX() && ox+30 > getX()) || (ox > getX() && ox < getX()+30)
+//						&&
+//						(oy < getY() && oy+30 > getY()) || (oy > getY() && oy < getY()+30);
+		return isOverrideHorizontal(ox) && isOverrideVertical(oy);
+	}
     
     @Override
     public void run() {
-    	x += h * valo_x;
-    	y += v * valo_y;
-    	
-    	Iterator<meteor> iMet = getMeteors().iterator();
-    	meteor mself = null;
-    	while(iMet.hasNext()) {
-    		meteor m = iMet.next();
-    		if(m.id == this.id) {
-    			mself = m;
-    			continue;
-    		}
-    		if(mself == null) continue;
-    		if(m.isOverride(getX(), getY())) {
-    			System.out.print("test\t");
-    			if(getX()+30 >= m.getX() || getX() >= m.getX()+30) {
-    				m.setForward(!m.isForward());
-    				mself.setForward(!isForward());
-        			System.out.print("1\t");
-    			}
-    			if(getY()+30 >= m.getY() || getY() >= m.getY()+30) {
-    				m.setUp(!m.isUp());
-    				mself.setUp(!isUp());
-        			System.out.print("2\t");
-    			}
-    			System.out.print("\n");
-    		}
-    	}
-    	
-    	if(x+45 > cFrame.getWidth() || x < 0) h *= -1;
-    	if(y+60 > cFrame.getHeight() || y < 0) v *= -1;
-    	setLocation((int)x, (int)y);
-    	try {
-			Thread.sleep(5);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		while(true){
+			Iterator<meteor> iMet = getMeteors().iterator();
+			while(iMet.hasNext()) {
+				meteor m = iMet.next();
+				if(m.id == this.id) {
+					continue;
+				}
+
+				if(m.isOverride(getX(), getY())) {
+
+//					System.out.print(((m.getX() > getX() && m.getX()+30 >= getX()) || (m.getX() > getX() && m.getX() <= getX()+30))+":"+((m.getY() > getY() && m.getY()+30 >= getY()) || (m.getY() > getY() && m.getY() <= getY()+30))+"\t");
+					if(m.isOverrideHorizontal(getX())) {
+						if(m.isRide() || isRide()) continue;
+						m.setRide(!m.isRide());
+						setRide(!isRide());
+
+//					if((m.getX() > getX() && m.getX()+30 > getX()) || (m.getX() > getX() && m.getX() < getX()+30)) {
+						m.setForward(!m.isForward());
+						setForward(!isForward());
+						System.out.print("1\t");
+					}
+					if(m.isOverrideVertical(getY())) {
+						if(m.isRide() || isRide()) continue;
+						m.setRide(!m.isRide());
+						setRide(!isRide());
+
+//					if((m.getY() > getY() && m.getY()+30 > getY()) || (m.getY() > getY() && m.getY() < getY()+30)) {
+						m.setUp(!m.isUp());
+						setUp(!isUp());
+						System.out.print("2\t");
+					}
+					System.out.print("\n");
+				} else {
+					if(m.isRide()) m.setRide(false);
+					if(isRide()) setRide(false);
+				}
+			}
+
+				x += h * valo_x;
+				y += v * valo_y;
+
+			if(x+45 > cFrame.getWidth() || x < 0) h *= -1;
+			if(y+60 > cFrame.getHeight() || y < 0) v *= -1;
+			setLocation((int)x, (int)y);
+			try {
+				Thread.sleep(5);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-    	run();
     }
     
     public void start() {

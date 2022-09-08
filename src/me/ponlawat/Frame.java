@@ -28,8 +28,8 @@ public class Frame extends JFrame
     	pan.setBackground(Color.BLACK);
 
     	
-    	for(int i = 0; i < 5; i++) {
-    		meteor met = new meteor(getcFrame(), pan);	
+    	for(int i = 0; i < 3; i++) {
+    		new meteor(getcFrame(), pan);
     	}
     	
     	for(meteor m : meteor.getMeteors()) {
