@@ -28,7 +28,7 @@ public class Frame extends JFrame
     	pan.setBackground(Color.BLACK);
 
     	
-    	for(int i = 0; i < 3; i++) {
+    	for(int i = 0; i < 10; i++) {
     		new meteor(getcFrame(), pan);
     	}
     	

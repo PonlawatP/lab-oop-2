@@ -25,11 +25,25 @@ public class meteor extends JPanel implements Runnable
 
 	boolean isRide = false;
 	
-//	double valo_x = 0.1 + new Random().nextDouble(0.6), valo_y = 0;
+//	double valo_x = 0, valo_y = 0.1 + new Random().nextDouble(0.6);
 	double valo_x = 0.1 + new Random().nextDouble(0.6), valo_y = 0.1 + new Random().nextDouble(0.6);
 	BufferedImage bi = null;
 	BufferedImage bif = new BufferedImage(30, 30, BufferedImage.TYPE_INT_ARGB);
-	
+
+	private void randomPosition(){
+		x = new Random().nextInt(cFrame.getWidth()-60);
+		y = new Random().nextInt(cFrame.getHeight()-60);
+
+		Iterator<meteor> metlist = getMeteors().iterator();
+		do {
+			if(!metlist.hasNext()) return;
+			meteor m = metlist.next();
+			if(m.isOverride(getX(), getY())){
+				randomPosition();
+			}
+		} while (metlist.hasNext());
+	}
+
     meteor(JFrame frame, JPanel panel){
     	cFrame = frame;
     	cPan = panel;
@@ -43,9 +57,7 @@ public class meteor extends JPanel implements Runnable
     	
     	bi = resize(bi, 30, 30);
 
-    	x = new Random().nextInt(cFrame.getWidth()-60);
-//    	y = new Random().nextInt(cFrame.getHeight()-60);
-    	y = 0;
+		randomPosition();
     	
     	setLocation((int)x,(int)y);
     	setBackground(null);
@@ -115,7 +127,7 @@ public class meteor extends JPanel implements Runnable
     	return h==1;
     }
     public boolean isUp() {
-    	return v==1;
+    	return v==-1;
     }
     public void setForward(boolean var) {
     	if(!var) h = -1; else h = 1;
@@ -140,13 +152,22 @@ public class meteor extends JPanel implements Runnable
 	}
 
 	public boolean isOverride(int ox, int oy) {
-//		boolean res =
-//				(ox < getX() && ox+30 > getX()) || (ox > getX() && ox < getX()+30)
-//						&&
-//						(oy < getY() && oy+30 > getY()) || (oy > getY() && oy < getY()+30);
 		return isOverrideHorizontal(ox) && isOverrideVertical(oy);
 	}
-    
+
+	private void handleMeteorAttack(meteor tarket, boolean forward_or_up){
+//			อัตราเร็ว | ทิศทาง
+		if(forward_or_up){
+			tarket.setForward(!tarket.isForward());
+			setForward(!isForward());
+			System.out.print("1\t");
+		} else {
+			tarket.setUp(!tarket.isUp());
+			setUp(!isUp());
+			System.out.print("2\t");
+		}
+	}
+
     @Override
     public void run() {
 		while(true){
@@ -158,37 +179,29 @@ public class meteor extends JPanel implements Runnable
 				}
 
 				if(m.isOverride(getX(), getY())) {
-
-//					System.out.print(((m.getX() > getX() && m.getX()+30 >= getX()) || (m.getX() > getX() && m.getX() <= getX()+30))+":"+((m.getY() > getY() && m.getY()+30 >= getY()) || (m.getY() > getY() && m.getY() <= getY()+30))+"\t");
 					if(m.isOverrideHorizontal(getX())) {
-						if(m.isRide() || isRide()) continue;
-						m.setRide(!m.isRide());
-						setRide(!isRide());
+//						if(m.isRide() || isRide()) continue;
+//						m.setRide(!m.isRide());
+//						setRide(!isRide());
 
-//					if((m.getX() > getX() && m.getX()+30 > getX()) || (m.getX() > getX() && m.getX() < getX()+30)) {
-						m.setForward(!m.isForward());
-						setForward(!isForward());
-						System.out.print("1\t");
+						handleMeteorAttack(m, true);
 					}
 					if(m.isOverrideVertical(getY())) {
-						if(m.isRide() || isRide()) continue;
-						m.setRide(!m.isRide());
-						setRide(!isRide());
+//						if(m.isRide() || isRide()) continue;
+//						m.setRide(!m.isRide());
+//						setRide(!isRide());
 
-//					if((m.getY() > getY() && m.getY()+30 > getY()) || (m.getY() > getY() && m.getY() < getY()+30)) {
-						m.setUp(!m.isUp());
-						setUp(!isUp());
-						System.out.print("2\t");
+						handleMeteorAttack(m, false);
 					}
 					System.out.print("\n");
 				} else {
-					if(m.isRide()) m.setRide(false);
-					if(isRide()) setRide(false);
+//					if(m.isRide()) m.setRide(false);
+//					if(isRide()) setRide(false);
 				}
 			}
 
-				x += h * valo_x;
-				y += v * valo_y;
+			x += h * valo_x;
+			y += v * valo_y;
 
 			if(x+45 > cFrame.getWidth() || x < 0) h *= -1;
 			if(y+60 > cFrame.getHeight() || y < 0) v *= -1;
