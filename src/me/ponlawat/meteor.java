@@ -50,7 +50,7 @@ public class meteor extends JPanel implements Runnable
 	private void randomPosition(){
 		x = new Random().nextInt(cFrame.getWidth()-60);
 		y = new Random().nextInt(cFrame.getHeight()-60);
-		
+
 //		y = 0;
 
 		Iterator<meteor> metlist = getMeteors().iterator();
@@ -303,7 +303,7 @@ public class meteor extends JPanel implements Runnable
 				}
 
 				if(m.isOverride(getMetX(), getMetY())) {
-					if(m.isOverrideHorizontal(getX())) {
+					if(m.isOverrideHorizontal(getMetX())) {
 						if(!m.isOverrideHorizontal(xf)) {
 							handleMeteorAttack(m, true);
 						}
