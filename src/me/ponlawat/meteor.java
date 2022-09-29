@@ -3,8 +3,6 @@ package me.ponlawat;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.charset.Charset;
@@ -55,9 +53,9 @@ public class meteor extends JPanel implements Runnable
 		do {
 			if(!metlist.hasNext()) return;
 			meteor m = metlist.next();
-//			if(m.isOverride(getMetX(), getMetY())){
-//				randomPosition();
-//			}
+			if(m.isOverride(getMetX(), getMetY())){
+				randomPosition();
+			}
 		} while (metlist.hasNext());
 
 		try {
@@ -79,21 +77,7 @@ public class meteor extends JPanel implements Runnable
     	} catch(Exception e) {}
     	
     	bi = resize(bi, 50, 50);
-
 		randomPosition();
-    	
-//    	setLocation((int)x,(int)y);
-//    	setLocation(0,0);
-//    	setBackground(null);
-//    	setForeground(null);
-//    	setOpaque(true);
-//    	setCursor(new Cursor(Cursor.HAND_CURSOR));
-    	
-//    	setSize(cFrame.getWidth(), cFrame.getHeight());
-//    	setSize(50, 50);
-
-//    	cPan.add(this);
-    	
     	al.add(this);
 		cFrame.setTitle(getMeteors().stream().filter(meteor -> !meteor.isDestroyed()).toList().size() + " meteor left | Meteor Simulator");
     }
@@ -239,6 +223,9 @@ public class meteor extends JPanel implements Runnable
 				}
 			}
 		}
+		//สุ่มความเร็มใหม่เมื่อชน
+		valo_x =  new Random().nextDouble(1.0)+0.1;
+		valo_y =  new Random().nextDouble(1.0)+0.1;
 //		target.randomRotate();
 //		randomRotate();
 	}
@@ -260,7 +247,6 @@ public class meteor extends JPanel implements Runnable
 				while(m.hasNext()) {
 					if(m.next().getID() == id) {
 						m.remove();
-
 						return;
 					}
 				}
@@ -269,7 +255,7 @@ public class meteor extends JPanel implements Runnable
 			}
 			if(isDestroyed() && !isBoom()) continue;
 
-
+			//คำนวณก่อนขยับ
 //			xf += h * valo_x;
 //			yf += v * valo_y;
 	    	
@@ -290,27 +276,25 @@ public class meteor extends JPanel implements Runnable
 
 				if(m.isOverride(getMetX(), getMetY())) {
 					if(m.isOverrideHorizontal(getMetX())) {
-//						if(!m.isOverrideHorizontal(xf)) {
+						if(!m.isOverrideHorizontal(xf)) {
 							handleMeteorAttack(m, true);
-//						}
+
+						}
 
 					}
 					
 					if(m.isOverrideVertical(getMetY())) {
-//						if(!m.isOverrideVertical(yf)) {
+						if(!m.isOverrideVertical(yf)) {
 							handleMeteorAttack(m, false);
-//						}
+						}
 					}
 				}
 			}
-			//สุ่มความเร็มใหม่เมื่อชน
-			valo_x =  new Random().nextDouble(1.0)+0.1;
-			valo_y =  new Random().nextDouble(1.0)+0.1;
 			//การเคลื่อนที่
 			x += h * valo_x;
 			y += v * valo_y;
 			
-
+			//ชนขอบเฟรม
 			if(x+45 > cFrame.getWidth() || x < 0) h *= -1;
 			if(y+60 > cFrame.getHeight() || y < 0) v *= -1;
 //			setLocation((int)x, (int)y);
