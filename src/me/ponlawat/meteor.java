@@ -42,9 +42,7 @@ public class meteor extends JPanel implements Runnable
 	public void setBoom(boolean boom) {
 		this.boom = boom;
 	}
-
-	//	double valo_x = 0.1 + new Random().nextDouble(0.6), valo_y = 0;
-	double valo_x = 0.1 + new Random().nextDouble(0.6), valo_y = 0.1 + new Random().nextDouble(0.6), valo_r = new Random().nextDouble(0.03);
+	double valo_x = 0.1 + new Random().nextDouble(1.0), valo_y = 0.1 + new Random().nextDouble(1.0);
 	BufferedImage bi = null;
 
 	private void randomPosition(){
@@ -57,9 +55,9 @@ public class meteor extends JPanel implements Runnable
 		do {
 			if(!metlist.hasNext()) return;
 			meteor m = metlist.next();
-			if(m.isOverride(getMetX(), getMetY())){
-				randomPosition();
-			}
+//			if(m.isOverride(getMetX(), getMetY())){
+//				randomPosition();
+//			}
 		} while (metlist.hasNext());
 
 		try {
@@ -99,10 +97,10 @@ public class meteor extends JPanel implements Runnable
     	al.add(this);
 		cFrame.setTitle(getMeteors().stream().filter(meteor -> !meteor.isDestroyed()).toList().size() + " meteor left | Meteor Simulator");
     }
-    
-    public void randomRotate() {
-    	valo_r = new Random().nextDouble(0.05);
-    }
+//
+//    public void randomRotate() {
+//    	valo_r = new Random().nextDouble(0.05);
+//    }
     
     public String getID() {
     	return id;
@@ -214,18 +212,7 @@ public class meteor extends JPanel implements Runnable
 		if(isDestroyed()) return;
 		setCursor(null);
 		setVisible(false);
-//		setBackground(Color.RED);
-		
 		setDestroyed(true);
-
-//		ImageIcon ic = new ImageIcon("images/bomb.gif");
-//    	boomlab.setIcon(ic);
-//    	boomlab.setSize(80, 80);
-//    	boomlab.setPreferredSize(new Dimension(80, 80));
-//    	boomlab.setLocation((int)getMetX()-20, (int)getMetY()-20);
-//    	boomlab.setVisible(true);
-//		cPan.add(boomlab);
-		
 	}
 
 	private void handleMeteorAttack(meteor target, boolean forward_or_up){
@@ -252,8 +239,8 @@ public class meteor extends JPanel implements Runnable
 				}
 			}
 		}
-		target.randomRotate();
-		randomRotate();
+//		target.randomRotate();
+//		randomRotate();
 	}
 
     @Override
@@ -268,8 +255,6 @@ public class meteor extends JPanel implements Runnable
 					e.printStackTrace();
 				}
 				setBoom(true);
-//				boomlab.setVisible(false);
-//				cPan.remove(cPan.getComponentCount()-1);
 
 				Iterator<meteor> m = getMeteors().iterator();
 				while(m.hasNext()) {
@@ -284,10 +269,11 @@ public class meteor extends JPanel implements Runnable
 			}
 			if(isDestroyed() && !isBoom()) continue;
 
-			xf += h * valo_x;
-			yf += v * valo_y;
+
+//			xf += h * valo_x;
+//			yf += v * valo_y;
 	    	
-	    	rotate += valo_r;
+//	    	rotate += valo_r;
 			
 			Iterator<meteor> iMet = getMeteors().iterator();
 			while(iMet.hasNext()) {
@@ -304,20 +290,23 @@ public class meteor extends JPanel implements Runnable
 
 				if(m.isOverride(getMetX(), getMetY())) {
 					if(m.isOverrideHorizontal(getMetX())) {
-						if(!m.isOverrideHorizontal(xf)) {
+//						if(!m.isOverrideHorizontal(xf)) {
 							handleMeteorAttack(m, true);
-						}
+//						}
 
 					}
 					
 					if(m.isOverrideVertical(getMetY())) {
-						if(!m.isOverrideVertical(yf)) {
+//						if(!m.isOverrideVertical(yf)) {
 							handleMeteorAttack(m, false);
-						}
+//						}
 					}
 				}
 			}
-
+			//สุ่มความเร็มใหม่เมื่อชน
+			valo_x =  new Random().nextDouble(1.0)+0.1;
+			valo_y =  new Random().nextDouble(1.0)+0.1;
+			//การเคลื่อนที่
 			x += h * valo_x;
 			y += v * valo_y;
 			

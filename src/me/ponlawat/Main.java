@@ -4,7 +4,7 @@ package me.ponlawat;
 public class Main
 {
     public static void main(String[] args) {
-    	int amount = 10;
+    	int amount = 50;
     	for(String a : args) {
     		if(a.contains("amout=")) {
     			try {
