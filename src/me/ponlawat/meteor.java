@@ -209,6 +209,15 @@ public class meteor extends JPanel implements Runnable
 	}
 
 	private void handleMeteorAttack(meteor target, boolean forward_or_up){
+		if(getMetX() < target.getMetX() && getMetX()+50 >= target.getMetX()){
+			setMetX(getMetX() - 1);
+		} else if(getMetX() >= target.getMetX() && getMetX() <= target.getMetX()+50){
+			setMetX(getMetX() + 1);
+		} else if(getMetY() < target.getMetY() && getMetY()+50 >= target.getMetY()){
+			setMetY(getMetY() - 1);
+		} else if(getMetY() >= target.getMetY() && getMetY() <= target.getMetY()+50){
+			setMetY(getMetY() + 1);
+		}
 
 		if(forward_or_up){
 			if(isForward() != target.isForward()){
