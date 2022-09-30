@@ -30,6 +30,12 @@ public class meteor extends JPanel implements Runnable
 	boolean ride = false;
 	boolean destroyed = false;
 	boolean boom = false;
+
+	boolean click = false;
+
+	boolean isColl = false;
+	int collThr = 0;
+	int nocollThr = 0;
 	
 	JLabel boomlab = new JLabel();
 
@@ -43,18 +49,21 @@ public class meteor extends JPanel implements Runnable
 	double valo_x = 0.1 + new Random().nextDouble(1.0), valo_y = 0.1 + new Random().nextDouble(1.0);
 	BufferedImage bi = null;
 
-	private void randomPosition(){
+	private boolean randomPosition(int i){
+		if(i >= 20) return false;
+
 		x = new Random().nextInt(cFrame.getWidth()-60);
 		y = new Random().nextInt(cFrame.getHeight()-60);
 
 //		y = 0;
 
-		Iterator<meteor> metlist = getMeteors().iterator();
+		ArrayList copy_mss = new ArrayList<>(meteor.getMeteors());
+		Iterator<meteor> metlist = copy_mss.iterator();
 		do {
-			if(!metlist.hasNext()) return;
+			if(!metlist.hasNext()) return true;
 			meteor m = metlist.next();
 			if(m.isOverride(getMetX(), getMetY())){
-				randomPosition();
+				return randomPosition(i+1);
 			}
 		} while (metlist.hasNext());
 
@@ -63,11 +72,15 @@ public class meteor extends JPanel implements Runnable
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		return true;
 	}
 
     meteor(JFrame frame){
     	cFrame = frame;
 //    	cPan = panel;
+
+		if(!randomPosition(1)) return;
+
     	new Random().nextBytes(b);
     	id = new String(b, Charset.forName("UTF-8"));
     	
@@ -77,14 +90,9 @@ public class meteor extends JPanel implements Runnable
     	} catch(Exception e) {}
     	
     	bi = resize(bi, 50, 50);
-		randomPosition();
     	al.add(this);
-		cFrame.setTitle(getMeteors().stream().filter(meteor -> !meteor.isDestroyed()).toList().size() + " meteor left | Meteor Simulator");
+		cFrame.setTitle(getMeteors().stream().filter(meteor -> meteor != null && !meteor.isDestroyed()).toList().size() + " meteor left | Meteor Simulator");
     }
-//
-//    public void randomRotate() {
-//    	valo_r = new Random().nextDouble(0.05);
-//    }
     
     public String getID() {
     	return id;
@@ -100,16 +108,6 @@ public class meteor extends JPanel implements Runnable
 	public BufferedImage getMeteorImg(){
 		return bi;
 	}
-
-//	@Override
-//    protected void paintComponent(Graphics g) {
-//    	if(isDestroyed()) return;
-//    	super.paintComponent(g);
-//
-//    	Graphics2D g2 = (Graphics2D) g;
-//    	g2.rotate(rotate, bi.getWidth() / 2, bi.getHeight() / 2);
-//    	g2.drawImage(bi, 0, 0, cFrame);
-//    }
 
     @Override
     public Dimension getPreferredSize() {
@@ -152,7 +150,16 @@ public class meteor extends JPanel implements Runnable
     public void setMetValoY(double y) {
     	this.valo_y = y;
     }
-    public boolean isForward() {
+
+	public boolean isClick() {
+		return click;
+	}
+
+	public void setClick(boolean click) {
+		this.click = click;
+	}
+
+	public boolean isForward() {
     	return h==1;
     }
     public boolean isUp() {
@@ -174,14 +181,16 @@ public class meteor extends JPanel implements Runnable
 	}
 
 	public boolean isOverrideHorizontal(double ox) {
-		return (ox < getMetX() && ox+50 >= getMetX()) || (ox >= getMetX() && ox < getMetX()+50);
+		return (ox < getMetX() && ox+50 >= getMetX()) || (ox >= getMetX() && ox <= getMetX()+50);
 	}
 	public boolean isOverrideVertical(double oy) {
-		return (oy < getMetY() && oy+50 >= getMetY()) || (oy >= getMetY() && oy < getMetY()+50);
+		return (oy < getMetY() && oy+50 >= getMetY()) || (oy >= getMetY() && oy <= getMetY()+50);
 	}
 
 	public boolean isOverride(double ox, double oy) {
-		return isOverrideHorizontal(ox) && isOverrideVertical(oy);
+		boolean a = isOverrideHorizontal(ox) && isOverrideVertical(oy);
+
+		return a;
 	}
 	
 	public boolean isDestroyed() {
@@ -200,6 +209,7 @@ public class meteor extends JPanel implements Runnable
 	}
 
 	private void handleMeteorAttack(meteor target, boolean forward_or_up){
+
 		if(forward_or_up){
 			if(isForward() != target.isForward()){
 				setForward(!isForward());
@@ -234,18 +244,18 @@ public class meteor extends JPanel implements Runnable
     public void run() {
 		while(!isDestroyed() || !isBoom()){
 			if(isDestroyed()) {
-				cFrame.setTitle(getMeteors().stream().filter(meteor -> !meteor.isDestroyed()).toList().size() + " meteor left | Meteor Simulator");
-
 				try {
-					Thread.sleep(700);
-				} catch (InterruptedException e) {
+					cFrame.setTitle(getMeteors().stream().filter(meteor -> meteor != null && !meteor.isDestroyed()).toList().size() + " meteor left | Meteor Simulator");
+					Thread.sleep(600);
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 				setBoom(true);
 
 				Iterator<meteor> m = getMeteors().iterator();
 				while(m.hasNext()) {
-					if(m.next().getID() == id) {
+					meteor mn = m.next();
+					if(mn != null && mn.getID() == id) {
 						m.remove();
 						return;
 					}
@@ -255,38 +265,26 @@ public class meteor extends JPanel implements Runnable
 			}
 			if(isDestroyed() && !isBoom()) continue;
 
-			//คำนวณก่อนขยับ
-//			xf += h * valo_x;
-//			yf += v * valo_y;
-	    	
-//	    	rotate += valo_r;
-			
-			Iterator<meteor> iMet = getMeteors().iterator();
-			while(iMet.hasNext()) {
-				meteor m;
-				try{
-					m = iMet.next();
-				} catch (ConcurrentModificationException ex){
-					continue;
-				}
+//			คำนวณก่อนขยับ
 
-				if(m.id == this.id) {
+
+			ArrayList copy_mss = new ArrayList<>(getMeteors());
+			Iterator<meteor> iMet = copy_mss.iterator();
+			while(iMet.hasNext()) {
+				meteor m = iMet.next();
+
+				if(id == null || m == null || m == this || m.isDestroyed() || m.isBoom()) {
 					continue;
 				}
 
 				if(m.isOverride(getMetX(), getMetY())) {
 					if(m.isOverrideHorizontal(getMetX())) {
-						if(!m.isOverrideHorizontal(xf)) {
 							handleMeteorAttack(m, true);
-
-						}
 
 					}
 					
 					if(m.isOverrideVertical(getMetY())) {
-						if(!m.isOverrideVertical(yf)) {
 							handleMeteorAttack(m, false);
-						}
 					}
 				}
 			}

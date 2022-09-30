@@ -49,7 +49,11 @@ public class Sight extends JPanel implements MouseMotionListener, MouseListener,
     public void mousePressed(MouseEvent e) {
         for(meteor m : meteor.getMeteors()) {
             if (m.isOverride(e.getX(), e.getY()) && !m.isDestroyed()) {
-                m.killMeteor();
+                if(m.isClick()){
+                    m.killMeteor();
+                } else {
+                    m.setClick(true);
+                }
                 break;
             }
         }
@@ -72,10 +76,20 @@ public class Sight extends JPanel implements MouseMotionListener, MouseListener,
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        System.out.println(e.getWheelRotation());
         if(e.getWheelRotation() == -1){
             meteor m = new meteor(cFrame);
             m.start();
+        } else {
+            if(meteor.getMeteors().size() > 0) {
+                int i = 0;
+                for (meteor m : meteor.getMeteors()){
+                    if(!m.isDestroyed()){
+                        m.setClick(true);
+                        m.killMeteor();
+                        break;
+                    }
+                }
+            }
         }
     }
 }
