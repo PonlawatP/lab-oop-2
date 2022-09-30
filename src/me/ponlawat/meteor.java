@@ -260,7 +260,7 @@ public class meteor extends JPanel implements Runnable
 					cFrame.setTitle(getMeteors().stream().filter(meteor -> meteor != null && !meteor.isDestroyed()).toList().size() + " meteor left | Meteor Simulator");
 					Thread.sleep(600);
 				} catch (Exception e) {
-					e.printStackTrace();
+//					e.printStackTrace();
 				}
 				setBoom(true);
 
