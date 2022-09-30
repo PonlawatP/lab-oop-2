@@ -254,7 +254,7 @@ public class meteor extends JPanel implements Runnable
 
     @Override
     public void run() {
-		while(!isDestroyed() || !isBoom()){
+		while(id != null && (!isDestroyed() || !isBoom())){
 			if(isDestroyed()) {
 				try {
 					cFrame.setTitle(getMeteors().stream().filter(meteor -> meteor != null && !meteor.isDestroyed()).toList().size() + " meteor left | Meteor Simulator");
