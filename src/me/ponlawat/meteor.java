@@ -242,11 +242,14 @@ public class meteor extends JPanel implements Runnable
 				}
 			}
 		}
+		randomValocity();
+//		target.randomRotate();
+//		randomRotate();
+	}
+	void randomValocity(){
 		//สุ่มความเร็มใหม่เมื่อชน
 		valo_x =  new Random().nextDouble(1.0)+0.1;
 		valo_y =  new Random().nextDouble(1.0)+0.1;
-//		target.randomRotate();
-//		randomRotate();
 	}
 
     @Override
@@ -274,8 +277,6 @@ public class meteor extends JPanel implements Runnable
 			}
 			if(isDestroyed() && !isBoom()) continue;
 
-//			คำนวณก่อนขยับ
-
 
 			ArrayList copy_mss = new ArrayList<>(getMeteors());
 			Iterator<meteor> iMet = copy_mss.iterator();
@@ -289,7 +290,6 @@ public class meteor extends JPanel implements Runnable
 				if(m.isOverride(getMetX(), getMetY())) {
 					if(m.isOverrideHorizontal(getMetX())) {
 							handleMeteorAttack(m, true);
-
 					}
 					
 					if(m.isOverrideVertical(getMetY())) {
@@ -302,8 +302,22 @@ public class meteor extends JPanel implements Runnable
 			y += v * valo_y;
 			
 			//ชนขอบเฟรม
-			if(x+45 > cFrame.getWidth() || x < 0) h *= -1;
-			if(y+60 > cFrame.getHeight() || y < 0) v *= -1;
+			if(x+68 >= cFrame.getWidth() || x < 0) {
+				h *= -1;
+				randomValocity();
+				if(x < 0) x = 0;
+			}
+			if(x+68 >= cFrame.getWidth()){
+				x--;
+			}
+			if(y+88 >= cFrame.getHeight() || y < 0) {
+				v *= -1;
+				randomValocity();
+				if(y < 0) y = 0;
+			}
+			if(y+88 >= cFrame.getHeight()){
+				y--;
+			}
 //			setLocation((int)x, (int)y);
 
 			cFrame.repaint();
